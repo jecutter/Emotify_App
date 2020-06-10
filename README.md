@@ -4,15 +4,15 @@
 Requirements:
 - python3.7
 - pip install:
-* numpy
-* pandas
-* scikit-learn
-* spotipy
-* nltk
-* langdetect
-* lyricsgenius
-* fuzzywuzzy
-* python-Levenshtein
+	* numpy
+	* pandas
+	* scikit-learn
+	* spotipy
+	* nltk
+	* langdetect
+	* lyricsgenius
+	* fuzzywuzzy
+	* python-Levenshtein
 
 Also, need the following environment variables:
 - GENIUS_API_KEY: token for querying Genius API
