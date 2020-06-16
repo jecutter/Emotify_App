@@ -29,14 +29,6 @@ from fuzzywuzzy import fuzz
 ### *Finding songs to meet your emotional needs*
 
 
-# Create and embed function for embedding Spotify
-# track player into the application
-def embed_spotify_track(track_id):
-	st.write(
-					f'<iframe src="https://open.spotify.com/embed/track/{track_id}" width="450" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>',
-					unsafe_allow_html=True,
-			)
-
 #####
 #@st.cache
 #def split_by_emotion(features, labels):
@@ -85,26 +77,47 @@ def embed_spotify_track(track_id):
 #scale_train = StandardScaler().fit(x_train)
 
 
-# Load our pretrained models
-pretrained_inst_scale = pickle.load(open('best_inst_scale.pkl', 'rb'))
-pretrained_inst_rfc = pickle.load(open('best_inst_rfc.pkl', 'rb'))
-pretrained_lyrical_scale = pickle.load(open('best_lyrical_scale.pkl', 'rb'))
-pretrained_lyrical_rfc = pickle.load(open('best_lyrical_rfc.pkl', 'rb'))
+# Create and embed function for embedding Spotify
+# track player into the application
+def embed_spotify_track(track_id):
+	st.write(
+					f'<iframe src="https://open.spotify.com/embed/track/{track_id}" width="450" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>',
+					unsafe_allow_html=True,
+			)
+
+@st.cache(allow_output_mutation=True)
+def load_models():
+	# Load our pretrained models
+	pretrained_inst_scale = pickle.load(open('best_inst_scale.pkl', 'rb'))
+	pretrained_inst_rfc = pickle.load(open('best_inst_rfc.pkl', 'rb'))
+	pretrained_lyrical_scale = pickle.load(open('best_lyrical_scale.pkl', 'rb'))
+	pretrained_lyrical_rfc = pickle.load(open('best_lyrical_rfc.pkl', 'rb'))
+	return pretrained_inst_scale, pretrained_inst_rfc, pretrained_lyrical_scale, pretrained_lyrical_rfc
+
+@st.cache(allow_output_mutation=True)
+def get_genius_api():
+	# Authenticate Genius instance (for lyrics)
+	GENIUS_API_KEY = os.getenv("GENIUS_API_KEY")
+	genius = lyricsgenius.Genius(GENIUS_API_KEY)
+	genius.verbose = False # turn off status messages 
+	genius.remove_section_headers = True # turn off lyrics section headers
+	return genius
+
+@st.cache(allow_output_mutation=True)
+def get_spotify_api():
+	# Authenticate Spotify instance (for audio)
+	SPOTIPY_CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
+	SPOTIPY_CLIENT_SECRET = os.getenv("SPOTIPY_CLIENT_SECRET")
+	token = spotipy.oauth2.SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
+	cache_token = token.get_access_token()
+	sp = spotipy.Spotify(cache_token)
+	return sp
 
 
-# Authenticate Genius instance (for lyrics)
-GENIUS_API_KEY = os.getenv("GENIUS_API_KEY")
-genius = lyricsgenius.Genius(GENIUS_API_KEY)
-genius.verbose = False # turn off status messages 
-genius.remove_section_headers = True # turn off lyrics section headers
-
-
-# Authenticate Spotify instance (for audio)
-SPOTIPY_CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
-SPOTIPY_CLIENT_SECRET = os.getenv("SPOTIPY_CLIENT_SECRET")
-token = spotipy.oauth2.SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
-cache_token = token.get_access_token()
-sp = spotipy.Spotify(cache_token)
+# Load models and get API instances
+pretrained_inst_scale, pretrained_inst_rfc, pretrained_lyrical_scale, pretrained_lyrical_rfc = load_models()
+genius = get_genius_api()
+sp = get_spotify_api()
 
 
 # Specify a default playlist ID
@@ -122,7 +135,7 @@ st.text('\n')
 # Placeholder if we want to replace an option menu with output
 #placeholder = st.empty()
 
-playlist_uri = st.text_input("Give a valid playlist URI (copied from Spotify):", discover_uri)
+playlist_uri = st.text_input("Give a valid playlist ID/URI (copied from Spotify):", discover_id)
 
 option_inst = st.selectbox('Do you want instrumental or lyrical music?',
 													('Lyrical/Vocal', 'Instrumental'))
@@ -239,4 +252,5 @@ if option == 'Happy' or option == 'Calm' or option == 'Sad' or option == 'Angry'
 		for song in songs:
 			#st.markdown('[{}]({}) by {}'.format(song['track_name'], song['link'], song['artist']))
 			embed_spotify_track(song['track_id'])
+			#time.sleep(0.5)
 
