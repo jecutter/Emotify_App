@@ -103,7 +103,7 @@ def get_genius_api():
 	genius.remove_section_headers = True # turn off lyrics section headers
 	return genius
 
-@st.cache(allow_output_mutation=True)
+#@st.cache(allow_output_mutation=True)
 def get_spotify_api():
 	# Authenticate Spotify instance (for audio)
 	SPOTIPY_CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
