@@ -88,10 +88,10 @@ def embed_spotify_track(track_id):
 @st.cache(allow_output_mutation=True)
 def load_models():
 	# Load our pretrained models
-	pretrained_inst_scale = pickle.load(open('best_inst_scale.pkl', 'rb'))
-	pretrained_inst_rfc = pickle.load(open('best_inst_rfc.pkl', 'rb'))
-	pretrained_lyrical_scale = pickle.load(open('best_lyrical_scale.pkl', 'rb'))
-	pretrained_lyrical_rfc = pickle.load(open('best_lyrical_rfc.pkl', 'rb'))
+	pretrained_inst_scale = pickle.load(open('models_v2/best_inst_scale.pkl', 'rb'))
+	pretrained_inst_rfc = pickle.load(open('models_v2/best_inst_rfc.pkl', 'rb'))
+	pretrained_lyrical_scale = pickle.load(open('models_v2/best_lyrical_scale.pkl', 'rb'))
+	pretrained_lyrical_rfc = pickle.load(open('models_v2/best_lyrical_rfc.pkl', 'rb'))
 	return pretrained_inst_scale, pretrained_inst_rfc, pretrained_lyrical_scale, pretrained_lyrical_rfc
 
 @st.cache(allow_output_mutation=True)
