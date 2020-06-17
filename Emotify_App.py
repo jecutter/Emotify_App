@@ -127,6 +127,9 @@ discover_id = '37i9dQZF1DWTLSN7iG21yC'  # "Work From Home" playlist
 discover_uri = 'spotify:playlist:'+discover_id
 discover_link = 'https://open.spotify.com/playlist/'+discover_id
 
+# Set a max wait time for Spotify querying and song classification
+max_wait_time = 45 # sec
+
 
 # Begin placing text and user interactions
 st.text('\n')
@@ -179,7 +182,9 @@ if option == 'Happy' or option == 'Calm' or option == 'Sad' or option == 'Angry'
 		except:
 			st.write('Could not find Spotify playlist. Using default playlist...')
 			result = sp.user_playlist_tracks('spotify', discover_uri.rsplit(':', 1)[-1])['items']
-		
+	
+		program_start = time.time()
+		timed_out = False
 		for track in result: 
 			# Get metadata 
 			artist = track["track"]["album"]["artists"][0]["name"] 
@@ -203,6 +208,13 @@ if option == 'Happy' or option == 'Calm' or option == 'Sad' or option == 'Angry'
 
 			# Get Spotify link to tracks
 			link = track['track']['external_urls']['spotify']
+
+			now = time.time()
+			if now - program_start > max_wait_time:
+				st.markdown(f'Taking too long to find {option} {option_inst} songs for you in this playlist!')
+				st.markdown('Try:\n* Choosing a different playlist \n* Toggling instrumental/vocal music')
+				timed_out = True
+				break
 
 			# Use pretrained model based on whether instrumental or lyrical
 			if option_inst == 'Lyrical/Vocal':
@@ -241,16 +253,21 @@ if option == 'Happy' or option == 'Calm' or option == 'Sad' or option == 'Angry'
 				if pretrained_inst_rfc.predict(scaled_features)[0].lower() == option.lower():
 					songs.append({ 'artist':artist, 'track_name':track_name, 'link':link, 'track_id':track_id })
 				else:
-					continue
-			
+					continue			
+	
 			if counter == 4:
 				break
 
 			counter += 1
 
-		st.markdown(f'Here are some songs from the Spotify playlist that will make you feel ... {option}!  {emoji_dict[option]}')
-		for song in songs:
-			#st.markdown('[{}]({}) by {}'.format(song['track_name'], song['link'], song['artist']))
-			embed_spotify_track(song['track_id'])
-			#time.sleep(0.5)
+		if not timed_out:
+			if len(songs):
+				st.markdown(f'Here are some songs from the Spotify playlist that will make you feel ... {option}!  {emoji_dict[option]}')
+				for song in songs:
+					#st.markdown('[{}]({}) by {}'.format(song['track_name'], song['link'], song['artist']))
+					embed_spotify_track(song['track_id'])
+					#time.sleep(0.5)
+			else:
+				st.markdown(f'Could not find any {option} {option_inst} songs for you in this playlist!')
+				st.markdown('Try:\n* Choosing a different playlist \n* Toggling instrumental/vocal music')
 
