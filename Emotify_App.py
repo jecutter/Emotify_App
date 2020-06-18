@@ -128,7 +128,7 @@ discover_uri = 'spotify:playlist:'+discover_id
 discover_link = 'https://open.spotify.com/playlist/'+discover_id
 
 # Set a max wait time for Spotify querying and song classification
-max_wait_time = 45 # sec
+max_wait_time = 60 # sec
 
 
 # Begin placing text and user interactions
@@ -147,16 +147,12 @@ option_inst = st.selectbox('Do you want instrumental or lyrical music?',
 option = st.selectbox('Select an emotion: ',
 										 ('-', 'Happy', 'Sad', 'Angry'))
 if option_inst == 'Instrumental':
-	#option = st.selectbox('Select an emotion: ',
-	#										 ('-', 'Happy', 'Calm', 'Sad', 'Angry'))
 	features_list = ['danceability', 'energy', 'loudness', 'speechiness',
-				 'acousticness', 'instrumentalness', 'valence', 'tempo', 'duration_ms']
+       'acousticness', 'valence', 'duration_ms']
 elif option_inst == 'Lyrical/Vocal':
-	#option = st.selectbox('Select an emotion: ',
-	#										 ('-', 'Happy', 'Sad', 'Angry'))
 	features_list = ['danceability', 'energy', 'key', 'loudness',
-							'speechiness', 'acousticness', 'instrumentalness', 'liveness',
-							'valence', 'tempo', 'duration_ms', 'mode', 'time_signature']
+            'speechiness', 'acousticness', 'instrumentalness', 'liveness',
+            'valence', 'tempo', 'duration_ms', 'mode', 'time_signature']
 	
 #features_list = ['danceability', 'energy', 'key', 'loudness', 
 #						'speechiness', 'acousticness', 'instrumentalness', 'liveness', 
@@ -210,10 +206,12 @@ if option == 'Happy' or option == 'Calm' or option == 'Sad' or option == 'Angry'
 			link = track['track']['external_urls']['spotify']
 
 			now = time.time()
-			if now - program_start > max_wait_time:
+			if now - program_start > max_wait_time and counter == 0:
 				st.markdown(f'Taking too long to find {option} {option_inst} songs for you in this playlist!')
 				st.markdown('Try:\n* Choosing a different playlist \n* Toggling instrumental/vocal music')
 				timed_out = True
+				break
+			elif now - program_start > max_wait_time and counter > 0:
 				break
 
 			# Use pretrained model based on whether instrumental or lyrical
