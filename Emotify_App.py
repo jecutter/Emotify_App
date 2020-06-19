@@ -123,7 +123,8 @@ sp = get_spotify_api()
 # Specify a default playlist ID
 #discover_uri = 'spotify:playlist:37i9dQZEVXcPBbdEIfyjYg'
 #discover_id = '37i9dQZEVXcPBbdEIfyjYg'
-discover_id = '37i9dQZF1DWTLSN7iG21yC'  # "Work From Home" playlist
+#discover_id = '37i9dQZF1DWTLSN7iG21yC'  # "Work From Home" playlist
+discover_id = '6kH58UmGHkvYBsOK0akvNR'  # "2000s Pop Hits" playlist
 discover_uri = 'spotify:playlist:'+discover_id
 discover_link = 'https://open.spotify.com/playlist/'+discover_id
 
